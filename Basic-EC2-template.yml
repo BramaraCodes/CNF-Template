@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create an EC2 instance
+
+Parameters:
+  InstanceType:
+    Description: This will spin up EC2 Instance Type
+    Type: String
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+
+Mappings :
+  Description: This will map the region to multiple AMI IDs
+  Type: String
+  RegionMap:
+        us-east-1:
+            AMI: ami-0ff8a91507f77f867
+        us-east-2:
+            AMI: ami-0b59bfac6be064b78
+        ap-south-1:
+            AMI: ami-0912f71e06545ad88
+
+Resources:
+  MyEC2Instance1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0abcdef1234567890  # Replace with a valid AMI ID for your region
+      KeyName: my-key-pair  # Replace with your key pair name
+      #S3 URL: https://s3.ap-south-1.amazonaws.com/cf-templates-i2f1umjtr9sj-ap-south-1/2025-08-26T014424.142Zk5b-EC2-template.yml
+  MyEC2Instance2:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !FindInMap 
+        - RegionMap
+        - !Ref "AWS::Region"
+        - AMI
+      KeyName: !Ref KeyName
+  MyEC2Instance3:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      Fn ::FindInMap:
+        - RegionMap
+        - !Ref "AWS::Region"
+        - AMI
+      Tags:
+        - Key: Name
+          Value: MyEC2Instance3
